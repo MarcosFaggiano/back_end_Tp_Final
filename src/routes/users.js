@@ -1,22 +1,12 @@
 const express = require("express");
 const userRouter = express.Router();
-
-
-
-// userRouter.post("/api/user", (req,res) => {
-// console.log(req.body);
-// console.log("id -" + req.body.id);
-// console.log("userid - " + req.body.userid);
-
-// res.status(200).json({message:"Hola estoy en el server y soy un metodo POST"})
-// })
+const User_controller = require("../controllers/User_controller")
 
 
 
 
-
-
-
+userRouter.post("/api/signup", User_controller.signUp);
+userRouter.post("/api/login", User_controller.login);
 
 
 module.exports = userRouter;

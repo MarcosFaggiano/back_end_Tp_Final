@@ -1,5 +1,3 @@
-
-
 DROP DATABASE IF EXISTS db_app_icaro;
 CREATE DATABASE db_app_icaro;
 USE db_app_icaro;

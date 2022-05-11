@@ -1,7 +1,7 @@
 module.exports = (sequelize, DataTypes) => {
 
 
-  let alias= "users";
+  let alias= "message";
   let cols = {
     id_message: {
       type: DataTypes.INTEGER,
