@@ -1,3 +1,4 @@
+const bcrypt = require("bcrypt");
 module.exports = (sequelize, DataTypes) => {
   
   
@@ -45,6 +46,39 @@ let config = {
 
 const Usuario = sequelize.define(alias, cols, config); 
 
+
+Usuario.associate = (models) => {
+
+Usuario.hasMany(models.Message,{
+  foreignKey: "id" ,
+  as: "sender"
+})
+
+
+Usuario.hasMany(models.Message,{
+  foreignKey: "id" ,
+  as: "receiver"
+})
+
+
+}
+
+// hasMany = tiene muchos
+// belongTo= Pertenece a
+
+Usuario.beforeCreate(async (user, options) => {
+  const salt = await bcrypt.genSalt();
+  return bcrypt
+    .hash(user.password, salt)
+    .then((hash) => {
+      user.password = hash;
+    })
+    .catch((err) => console.log(err));
+});
+
+
 return Usuario
 
 }
+
+

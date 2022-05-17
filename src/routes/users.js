@@ -4,7 +4,11 @@ const User_controller = require("../controllers/User_controller")
 
 
 router.get("/api/list", User_controller.list);
+router.get("/api/users/:username/messages/inbox", User_controller.receivedMessagesById);
+router.get("/api/users/:username/messages/sent", User_controller.sentMessagesById);
 
+
+router.post("/api/users/:username/messages", User_controller.SendMessageToId);
 router.post("/api/signup", User_controller.signUp);
 // userRouter.post("/api/login", User_controller.login);
 

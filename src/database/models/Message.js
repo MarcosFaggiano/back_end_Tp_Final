@@ -1,9 +1,9 @@
 module.exports = (sequelize, DataTypes) => {
 
 
-  let alias= "message";
+  let alias= "Message";
   let cols = {
-    id_message: {
+    id: {
       type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey: true,
@@ -34,8 +34,24 @@ let config = {
   timestamps: false,
 };
 
-const Usuario = sequelize.define(alias, cols, config);
+const Message = sequelize.define(alias, cols, config);
 
-return Usuario
+Message.associate = (models) => {
+
+  Message.belongsTo(models.User,{
+    foreignKey: "id" ,
+    as: "sender"
+  })
+  
+  Message.belongsTo(models.User,{
+    foreignKey: "id" ,
+    as: "receiver"
+  })  
+
+
+
+  }
+
+return Message
 
 }
