@@ -22,6 +22,7 @@ module.exports = (sequelize, DataTypes) => {
     isRead: {
       type: DataTypes.INTEGER,
       allowNull: false,
+      defaultValue: 0,
     },
   };
 

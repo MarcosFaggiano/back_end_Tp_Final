@@ -120,17 +120,19 @@ module.exports = User_controller = {
   // -----------------------------------------------------------------------------------------------------------------------//
   // Enviados
   sentMessagesById: async (req, res) => {
-    const { username: id } = req.params;
     //VALIDAR ID url = ID LOGIN
     try {
-      const result = await db.Message.findAll({
+      const username = req.params.username;
+      console.log("username", username);
+      const result = await db.User.findAll({
         where: {
-          id_user: id,
+          username: username,
         },
-        include: {
-          model: db.User,
-          association: "user_message",
-        },
+        include: [
+          {
+            association: "message_user",
+          },
+        ],
       });
       res.json({ result });
     } catch (error) {
@@ -141,6 +143,8 @@ module.exports = User_controller = {
 
   // -----------------------------------------------------------------------------------------------------------------------//
   // Casilla Enviar
+
+  //
 
   SendMessageToId: async (req, res) => {
     console.log(req.body);
