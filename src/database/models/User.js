@@ -1,8 +1,6 @@
 const bcrypt = require("bcrypt");
 module.exports = (sequelize, DataTypes) => {
-  
-  
-  let alias= "User";
+  let alias = "User";
   let cols = {
     id: {
       type: DataTypes.INTEGER,
@@ -37,48 +35,18 @@ module.exports = (sequelize, DataTypes) => {
     },
   };
 
+  let config = {
+    tableName: "user",
+    timestamps: false,
+  };
 
+  const Usuario = sequelize.define(alias, cols, config);
 
-let config = {
-  tableName:"user",
-  timestamps: false,
+  Usuario.associate = (models) => {
+    Usuario.hasMany(models.Message, {
+      foreignKey: "id_user",
+      as: "message_user",
+    });
+  };
+  return Usuario;
 };
-
-const Usuario = sequelize.define(alias, cols, config); 
-
-
-Usuario.associate = (models) => {
-
-Usuario.hasMany(models.Message,{
-  foreignKey: "id" ,
-  as: "sender"
-})
-
-
-Usuario.hasMany(models.Message,{
-  foreignKey: "id" ,
-  as: "receiver"
-})
-
-
-}
-
-// hasMany = tiene muchos
-// belongTo= Pertenece a
-
-Usuario.beforeCreate(async (user, options) => {
-  const salt = await bcrypt.genSalt();
-  return bcrypt
-    .hash(user.password, salt)
-    .then((hash) => {
-      user.password = hash;
-    })
-    .catch((err) => console.log(err));
-});
-
-
-return Usuario
-
-}
-
-
