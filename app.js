@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 const port = 3000;
 app.use(express.urlencoded({ extended: false }));
+app.use(express.json());
 
 const userRouter = require("./src/routes/users");
 const messageRouter = require("./src/routes/messages");

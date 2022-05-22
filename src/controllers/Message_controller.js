@@ -21,6 +21,7 @@ module.exports = Message_controllers ={
     console.log("Entro en el read")
     res.json({ status: http.StatusCodes.OK, data: "Message update successfully", message: message});
   },
+  
 
 
 

@@ -35,10 +35,21 @@ module.exports = (sequelize, DataTypes) => {
 
   Message.associate = (models) => {
     Message.belongsTo(models.User, {
-      as: "user_message",
       foreignKey: "id_user",
+      as: "user_message",
     });
+
+  Message.belongsTo(models.User, {
+    foreignKey: "id_receiver",
+    as: "user_message2",
+  });
+
+
+    
   };
+//----------------------------------------------
+// Message.associate = (models) => {
+
 
   return Message;
 };

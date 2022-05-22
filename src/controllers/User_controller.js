@@ -1,9 +1,9 @@
 let db = require("../database/models");
-const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
 // Consultar si el models trae todos los modelos o hay que hacer referencia al de usuario
 // const User = require("../database/models/User");
 
-// Metodo list, se genera para traer todos los datos del usuario
+// OK Metodo list, se genera para traer todos los datos del usuario
 module.exports = User_controller = {
   list: async (req, res) => {
     try {
@@ -18,52 +18,32 @@ module.exports = User_controller = {
     }
   },
   // -----------------------------------------------------------------------------------------------------------------------//
+ // OK crear usuario
   signUp: async (req, res) => {
-    const data = ({ firstname, lastname, username, password, city, country } =
-      req.body);
-    console.log(
-      "🚀 ~ file: User_controller.js ~ line 22 ~ signUp ~ data",
-      req.body
-    );
-
-    // con el codigo de abajo: Verificamos que no se ingresn usuarios repetidos
+    const data = ({ firstname, lastname, username, password, city, country}= req.body)
     try {
-      const exists_Usuario = await db.user.findAll({
-        where: {
-          username: data.username,
-        },
-        attributes: ["firstname", "username"],
-      });
-      // con el codigo de abajo: si todo va bien y el usuario no esta repetido, vamos a crear un token que son creados en la funsion de la linea 52
-      if (!exists_Usuario.count) {
-        const user = await db.user.create(data);
-        if (user) {
-          const token = _createToken(user.id, user.username);
-          res.set("Authorization", "Bearer " + token);
-          return res.json({ status: http.StatusCodes.OK, data: user });
-        }
-      }
-
-      return res.json({
-        status: http.StatusCodes.BAD_REQUEST,
-        data: "Existing username, enter another",
+      let createUser = await db.User.create(data);
+      console.log(createUser);
+      res.json({
+        status: 200,
+        user: createUser,
       });
     } catch (error) {
-      console.log("error: ", error);
-      return res.json({
-        status: http.StatusCodes.INTERNAL_SERVER_ERROR,
-        data: {},
-      });
+      res.send(error);
     }
   },
 
   // -----------------------------------------------------------------------------------------------------------------------//
 
-  createToken: (id, username) => {
-    return jwt.sign({ id, username }, process.env.JWT_SECRET, {
-      expiresIn: "30m",
-    });
-  },
+  user: db.User.beforeCreate(async (user, options) => {
+    const salt = await bcrypt.genSalt();
+    return bcrypt
+      .hash(user.password, salt)
+      .then((hash) => {
+        user.password = hash;
+      })
+      .catch((err) => console.log(err));
+  }),
 
   // -----------------------------------------------------------------------------------------------------------------------//
   login: async (req, res) => {
@@ -95,21 +75,22 @@ module.exports = User_controller = {
   },
 
   // -----------------------------------------------------------------------------------------------------------------------//
-  // Inbox
+  // ok Inbox
   receivedMessagesById: async (req, res) => {
-    const { username: id } = req.params;
     //VALIDAR ID url = ID LOGIN
     try {
-      const result = await db.Message.findAll({
+      const username = req.params.username;
+      console.log("username", username);
+      const result = await db.User.findAll({
         where: {
-          id_receiver: id,
+          username: username,
         },
-        include: {
-          model: db.User,
-          association: "user_message",
-        },
+        include: [
+          {
+            association: "message_user2",
+          },
+        ],
       });
-
       res.json({ result });
     } catch (error) {
       console.log(error);
@@ -118,7 +99,7 @@ module.exports = User_controller = {
   },
 
   // -----------------------------------------------------------------------------------------------------------------------//
-  // Enviados
+  // OK Enviados
   sentMessagesById: async (req, res) => {
     //VALIDAR ID url = ID LOGIN
     try {

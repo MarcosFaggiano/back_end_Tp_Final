@@ -1,4 +1,3 @@
-const bcrypt = require("bcrypt");
 module.exports = (sequelize, DataTypes) => {
   let alias = "User";
   let cols = {
@@ -37,7 +36,7 @@ module.exports = (sequelize, DataTypes) => {
 
   let config = {
     tableName: "user",
-    timestamps: false,
+    timestamps: true,
   };
 
   const Usuario = sequelize.define(alias, cols, config);
@@ -47,6 +46,22 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: "id_user",
       as: "message_user",
     });
+
+  Usuario.hasMany(models.Message, {
+    foreignKey: "id_receiver",
+    as: "message_user2",
+  });
+
+
+
   };
+//----------------------------------------------
+// Usuario.associate = (models) => {
+//   Usuario.hasMany(models.Message, {
+//     foreignKey: "id_receiver",
+//     as: "message_user2",
+//   });
+// };
+
   return Usuario;
 };
