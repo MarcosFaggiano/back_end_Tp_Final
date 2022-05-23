@@ -1,10 +1,11 @@
 let db = require("../database/models");
 const bcrypt = require("bcrypt");
-// Consultar si el models trae todos los modelos o hay que hacer referencia al de usuario
-// const User = require("../database/models/User");
+const http = require("http-status-codes");
+
+// -----------------------------------------------------------------------------------------------------------------------//
+module.exports = User_controller = {
 
 // OK Metodo list, se genera para traer todos los datos del usuario
-module.exports = User_controller = {
   list: async (req, res) => {
     try {
       let allUsers = await db.User.findAll();
@@ -18,7 +19,7 @@ module.exports = User_controller = {
     }
   },
   // -----------------------------------------------------------------------------------------------------------------------//
- // OK crear usuario
+// OK Crear Usuario
   signUp: async (req, res) => {
     const data = ({ firstname, lastname, username, password, city, country}= req.body)
     try {
@@ -33,8 +34,8 @@ module.exports = User_controller = {
     }
   },
 
-  // -----------------------------------------------------------------------------------------------------------------------//
-
+// -----------------------------------------------------------------------------------------------------------------------//
+//ok hasheo de pass
   user: db.User.beforeCreate(async (user, options) => {
     const salt = await bcrypt.genSalt();
     return bcrypt
@@ -45,11 +46,18 @@ module.exports = User_controller = {
       .catch((err) => console.log(err));
   }),
 
-  // -----------------------------------------------------------------------------------------------------------------------//
+//ok Compara el password que esta ingresando el usuario con guardado y hasheado en la db ,
+// lo desencripta y si coincide le da acceso.
+
+  User: db.User.prototype.comparePassword = async (passaword, user) => {
+    return await bcrypt.compare(passaword, user.password);
+  },
+
+// -----------------------------------------------------------------------------------------------------------------------//
   login: async (req, res) => {
     const { username, password } = req.body;
 
-    const user = await db.findOne({
+    const user = await db.User.findOne({
       where: {
         username,
       },
@@ -58,7 +66,6 @@ module.exports = User_controller = {
     // Si el usuario existe debemos comparar la contraseña
     if (user) {
       const result = await user.comparePassword(password, user);
-
       if (result) {
         return res.json({
           status: http.StatusCodes.OK,
@@ -74,8 +81,8 @@ module.exports = User_controller = {
     });
   },
 
-  // -----------------------------------------------------------------------------------------------------------------------//
-  // ok Inbox
+// -----------------------------------------------------------------------------------------------------------------------//
+// ok Inbox
   receivedMessagesById: async (req, res) => {
     //VALIDAR ID url = ID LOGIN
     try {
@@ -98,8 +105,8 @@ module.exports = User_controller = {
     }
   },
 
-  // -----------------------------------------------------------------------------------------------------------------------//
-  // OK Enviados
+// -----------------------------------------------------------------------------------------------------------------------//
+// OK Enviados
   sentMessagesById: async (req, res) => {
     //VALIDAR ID url = ID LOGIN
     try {
@@ -122,29 +129,19 @@ module.exports = User_controller = {
     }
   },
 
-  // -----------------------------------------------------------------------------------------------------------------------//
-  // Casilla Enviar
+// -----------------------------------------------------------------------------------------------------------------------//
+// Casilla de Enviar
 
-  //
+SendMessageToId : async (req, res) => {
+  console.log(req.body);
+  const data = ({ message, id_receiver, isRead } = req.body);
+  const { username } = req.params;
+  const newMessage = await db.Message.create({
+    ...data,
+    user_message: parseInt(username), 
+    isRead: 0
+  });
+  res.json({ status: http.StatusCodes.OK, data: newMessage });
+},
 
-  SendMessageToId: async (req, res) => {
-    console.log(req.body);
-    const data = ({ message, id_receiver, isRead } = req.body);
-    const { username } = req.params;
-    const newMessage = await db.Message.create({
-      ...data,
-      id_user: parseInt(username),
-      isRead: 0,
-    });
-    res.json({ status: http.StatusCodes.OK, data: newMessage });
-  },
-
-  // deleteUser: async(req, res) => {
-  //   const data =({username: id}) = req.params;
-  //   try {
-  //     const result = await db.username.delete({ ...data,id_user: parseInt(username), })
-  //   } catch (error) {
-
-  //   }
-  // }
 };
