@@ -2,9 +2,10 @@ let db = require("../database/models");
 const bcrypt = require("bcrypt");
 const http = require("http-status-codes");
 
-// -----------------------------------------------------------------------------------------------------------------------//
+
 module.exports = User_controller = {
 
+// -----------------------------------------------------------------------------------------------------------------------//
 // OK Metodo list, se genera para traer todos los datos del usuario
   list: async (req, res) => {
     try {
@@ -33,7 +34,6 @@ module.exports = User_controller = {
       res.send(error);
     }
   },
-
 // -----------------------------------------------------------------------------------------------------------------------//
 //ok hasheo de pass
   user: db.User.beforeCreate(async (user, options) => {
@@ -143,8 +143,5 @@ SendMessageToId : async (req, res) => {
   });
   res.json({ status: http.StatusCodes.OK, data: newMessage });
 },
-
-
-
 
 };

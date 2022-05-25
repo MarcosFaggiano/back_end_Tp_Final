@@ -1,9 +1,10 @@
 let db = require ('../database/models');
 const http = require("http-status-codes");
 
-
 module.exports = Message_controllers ={
 
+// -----------------------------------------------------------------------------------------------------------------------//
+// Eliminar mensaje
   deleteMessage : async (req, res) => {
     const { id: id } = req.params;
     const message = await db.Message.findOne({where: {id}})
