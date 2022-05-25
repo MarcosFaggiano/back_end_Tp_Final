@@ -135,13 +135,16 @@ module.exports = User_controller = {
 SendMessageToId : async (req, res) => {
   console.log(req.body);
   const data = ({ message, id_receiver, isRead } = req.body);
-  const { username } = req.params;
+  const username  = req.params.username;
   const newMessage = await db.Message.create({
     ...data,
-    user_message: parseInt(username), 
+    id_user: username,
     isRead: 0
   });
   res.json({ status: http.StatusCodes.OK, data: newMessage });
 },
+
+
+
 
 };
