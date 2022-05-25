@@ -8,6 +8,7 @@ module.exports = User_controller = {
 // -----------------------------------------------------------------------------------------------------------------------//
 // OK Metodo list, se genera para traer todos los datos del usuario
   list: async (req, res) => {
+
     try {
       let allUsers = await db.User.findAll();
       console.log(allUsers);
@@ -22,8 +23,10 @@ module.exports = User_controller = {
   // -----------------------------------------------------------------------------------------------------------------------//
 // OK Crear Usuario
   signUp: async (req, res) => {
-    const data = ({ firstname, lastname, username, password, city, country}= req.body)
+ 
     try {
+      console.log(req.body)
+      const data = ({ firstname, lastname, username, password, city, country}= req.body)
       let createUser = await db.User.create(data);
       console.log(createUser);
       res.json({
@@ -55,36 +58,42 @@ module.exports = User_controller = {
 
 // -----------------------------------------------------------------------------------------------------------------------//
   login: async (req, res) => {
-    const { username, password } = req.body;
 
-    const user = await db.User.findOne({
-      where: {
-        username,
-      },
-    });
-    console.log(user);
-    // Si el usuario existe debemos comparar la contraseña
-    if (user) {
-      const result = await user.comparePassword(password, user);
-      if (result) {
-        return res.json({
-          status: http.StatusCodes.OK,
-          data: "Autheticated",
-          msg: "OK credentials",
-        });
-      }
+try {
+  const { username, password } = req.body;
+  const user = await db.User.findOne({
+    where: {
+      username,
+    },
+  });
+  console.log(user);
+  // Si el usuario existe debemos comparar la contraseña
+  if (user) {
+    const result = await user.comparePassword(password, user);
+    if (result) {
+      return res.json({
+        status: http.StatusCodes.OK,
+        data: "Autheticated",
+        msg: "OK credentials",
+      });
     }
-    return res.json({
-      status: http.StatusCodes.OK,
-      data: "Unautheticated",
-      msg: "Bad credentials",
-    });
+  }
+  return res.json({
+    status: http.StatusCodes.OK,
+    data: "Unautheticated",
+    msg: "Bad credentials",
+  });
+  
+} catch (e) {
+  res.send(e)
+}
+
   },
 
 // -----------------------------------------------------------------------------------------------------------------------//
 // ok Inbox
   receivedMessagesById: async (req, res) => {
-    //VALIDAR ID url = ID LOGIN
+
     try {
       const username = req.params.username;
       console.log("username", username);
@@ -108,7 +117,7 @@ module.exports = User_controller = {
 // -----------------------------------------------------------------------------------------------------------------------//
 // OK Enviados
   sentMessagesById: async (req, res) => {
-    //VALIDAR ID url = ID LOGIN
+
     try {
       const username = req.params.username;
       console.log("username", username);
@@ -133,15 +142,27 @@ module.exports = User_controller = {
 // Casilla de Enviar
 
 SendMessageToId : async (req, res) => {
-  console.log(req.body);
-  const data = ({ message, id_receiver, isRead } = req.body);
-  const username  = req.params.username;
-  const newMessage = await db.Message.create({
-    ...data,
-    id_user: username,
-    isRead: 0
-  });
-  res.json({ status: http.StatusCodes.OK, data: newMessage });
-},
+
+  try {
+    console.log(req.body);
+    const data = ({ message, id_receiver, isRead } = req.body);
+    const username  = req.params.username;
+    const user = await db.User.findOne({
+      where: {
+        username: username
+      }
+    });
+  
+    console.log("user",user)
+    const newMessage = await db.Message.create({
+      ...data,
+      id_user: user.id,
+      isRead: 0
+    });
+    res.json({ status: http.StatusCodes.OK, data: newMessage });
+  } catch (e) {
+    res.send(e)
+  }
+}
 
 };
